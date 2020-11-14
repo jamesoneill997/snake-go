@@ -1,43 +1,78 @@
 package main
 
 import (
-	"fmt"
-	"strings"
+	"log"
+
+	. "github.com/gbin/goncurses"
 )
 
-/*
-snake
-controls
-food
-border
-movement
-hit logic
-score
-*/
+const (
+	HEIGHT = 30
+	WIDTH  = 90
+)
 
-//Snake is the player struct
-type Snake struct {
-	length string
-	alive  bool
-	speed  float32
-}
+func main() {
+	head := [2]int{3, 3}
+	snake := []string{"0"}
 
-//DrawBox function will draw the gameboard
-func DrawBox(w int, h int, snakePos [2]int, foodPos [2]int) {
-	for i := 0; i <= h; i++ {
-		if i == 0 || i == h {
-			fmt.Println(strings.Repeat("-", w))
-		} else {
-			fmt.Println("|", strings.Repeat(" ", w-4), "|")
+	stdscr, err := Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer End()
+
+	Raw(true)
+	Echo(false)
+	Cursor(0)
+	stdscr.Clear()
+	stdscr.Keypad(true)
+
+	my, mx := stdscr.MaxYX()
+	y, x := my/2, (mx/2)-(WIDTH/2)
+
+	win, _ := NewWindow(HEIGHT, WIDTH, y, x)
+	win.Keypad(true)
+
+	stdscr.Print("Use arrow keys to go up and down, Press enter to select")
+	stdscr.Refresh()
+
+	printsnake(win, snake, head)
+
+	for {
+		ch := stdscr.GetChar()
+		switch Key(ch) {
+		case 'q':
+			return
+		case KEY_UP:
+			head[0]--
+
+		case KEY_DOWN:
+			head[0]++
+
+		case KEY_LEFT:
+			head[1]--
+
+		case KEY_RIGHT:
+			head[1]++
 		}
+
+		printsnake(win, snake, head)
 	}
 }
 
-func main() {
-	boardSize := [2]int{124, 80} //h,w - Ratio of 31:20
-	snakePos := [2]int{0, 0}
-	foodPos := [2]int{10, 10}
+func printsnake(w *Window, snake []string, head [2]int) {
+	//determines position of snake head
+	x := head[1]
 
-	DrawBox(boardSize[0], boardSize[1], snakePos, foodPos)
+	w.Box(0, 0)
 
+	for i, s := range snake {
+		if i == head[0] {
+			w.MovePrint(head[0]+1, x, s)
+
+		} else {
+			w.MovePrint(head[0]+1, x, s)
+		}
+	}
+	w.Refresh()
 }
