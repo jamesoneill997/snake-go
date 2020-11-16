@@ -81,7 +81,7 @@ func main() {
 		snake = Insert(snake, 0, newHead)
 		stdscr.MovePrint(newHead[0], newHead[1], "o")
 		stdscr.MovePrint(snake[len(snake)-1][0], snake[len(snake)-1][1], " ")
-		tail := len(snake) - 1
+		tail := len(snake)
 		snake = append(snake[:tail])
 		stdscr.Refresh()
 	}
